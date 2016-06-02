@@ -1,0 +1,68 @@
+library(ggplot2)
+library(lubridate)
+library(lme4)
+
+dades <- read.csv(
+	"C:/Documents and Settings/rborras/Escritorio/7.UNI_ASTERIX/POSTGRAU_DATA_SCIENCE/PROJECTE/data.csv")
+
+names(dades)
+
+dades$Id_bitllet <- paste(dades$ID_Vuelo, dades$fecha_salida, dades$hora_llegada,sep = '/')
+dades$Id_bitllet <- as.factor(as.numeric(as.factor(dades$Id_bitllet)))
+
+dades$dias_antelacion <- dades$dias_antelacion*-1
+
+dades$fecha_salida_dia_setmana <- weekdays(as.Date(dades$fecha_salida))
+dades$dia_query_dia_setmana <- weekdays(as.Date(dades$dia_query))
+
+sum(table(dades$Id_bitllet)>30)
+
+summary(dades)
+sum(table(unique(dades$ID_Vuelo)))
+
+sum(table(dades$Id_bitllet)>0)
+sum(table(dades$Id_bitllet)>30)
+
+
+#Plots
+figura_1 <- ggplot(data = dades, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=Id_bitllet)) + 
+	geom_point(size=1.5) + geom_line( lwd=1.3) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") + theme(legend.position="none")
+figura_1
+
+figura_1 <- ggplot(data = dades, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=Id_bitllet)) + 
+	geom_line( lwd=0.4) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") + 
+	theme(legend.position="none") + facet_grid(nombre_ciudad_destino ~ ., scales = "free")
+figura_1
+
+figura_1 <- ggplot(data = dades, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=Id_bitllet)) + 
+	geom_line( lwd=0.4) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") + 
+	theme(legend.position="none") + facet_grid(nombre_ciudad_destino ~ fecha_salida_dia_setmana, scales = "free")
+figura_1
+
+dades$
+#table(dades[dades$Id_bitllet=='LH1815',]$dia_query)
+#dades[dades$ID_Vuelo=='LH1815',]$dia_query
+#dim(dades[dades$ID_Vuelo=='LH1815',])
+#dbdt$time_2 <- -1
+#dbdt[dbdt$nhc== '134203',]$time_2 <- seq(1:(nrow(dbdt[dbdt$nhc== '134203',])))
+#dbdt[dbdt$nhc== '180843',]$time_2 <- seq(1:(nrow(dbdt[dbdt$nhc== '180843',])))
+
+figura_exemple <- subset(dades, Id_bitllet=="1640" | Id_bitllet=="1658")
+
+
+figura_1 <- ggplot(data = figura_exemple, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=Id_bitllet)) + 
+	geom_point(size=1.5) + geom_line( lwd=1.3) + theme_grey(base_size = 20) + xlab("TIME") + ylab("DTN")
+figura_1
+
+
+figura_1 <- ggplot(data = figura_exemple, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=Id_bitllet)) + 
+	geom_point(size=1.5) + geom_line( lwd=1.3) + theme_grey(base_size = 20) + xlab("TIME") + ylab("DTN")
+figura_1
+
+#models
+model <- lmer(precio ~ dias_antelacion + (1+dias_antelacion|Id_bitllet), dades)
+summary(model)
+plot(model)
+
+table(dades$Id_bitllet,dades$hora_llegada)
+fecha_llegada

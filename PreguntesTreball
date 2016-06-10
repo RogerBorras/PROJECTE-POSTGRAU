@@ -1,0 +1,24 @@
+Dilluns estructurar les dades
+
+Identificar quins son els vols qe hem d'scrapejar
+
+Revisar creació de la variable objectiu
+
+Com visualitzar els resultats al Notebook. Notebook més currats. 
+
+Contingut:
+Preguntes Inicials:
+  Amb quants dies d'antelació s'ha de comprar?
+  Quin dia de la setmana volar?
+  Quin dia de la setmana comprar?
+  Quin destí és més barat?
+  Quina distancia és més cara?
+  Preu promig per km?
+  Quin aeroport és més car?
+  Quina companyia es més cara?Comparar companyies en un mateix origen-destí
+  Comparar low-cost amb no low-cost
+  Mirar diferents franjes horaries d'un mateix vol
+  
+Recomanador Compra/No Compra
+Prediccions dels preus de tots els vols, en un dia concret per resaltar el de preu mínim. On viatjo demà?
+Visualitzar l'evolució del preu del vol en els próxims x dies. 

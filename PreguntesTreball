@@ -20,6 +20,8 @@ Preguntes Inicials:
   Mirar diferents franjes horaries d'un mateix vol
   Hi ha companyies o vols que no varien gaire els preus?
   
+  Fer gràfic, del promig de preu d'un vol, segons el dia de la setmana de la query (tipo el grafic Jordina)
+  
 Recomanador Compra/No Compra
 Prediccions dels preus de tots els vols, en un dia concret per resaltar el de preu mínim. On viatjo demà?
 Visualitzar l'evolució del preu del vol en els próxims x dies. 

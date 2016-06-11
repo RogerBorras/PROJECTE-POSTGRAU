@@ -1,8 +1,6 @@
-# PROJECTE-POSTGRAU
+# PROJECTE POSTGRAU
 
 ## INTRODUCCIÓ A DATA SCIENCE & BIG DATA
-
-### Projecte final de Postgrau
 
 Equip: Jordina Orcajo, Angela Roca, Alba Conde, Roger Borràs
 

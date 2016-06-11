@@ -2,8 +2,10 @@
 
 ## INTRODUCCIÓ A DATA SCIENCE & BIG DATA
 
-Jordina Orcajo, Angela Roca, Roger Borràs, Alba Conde
+### Projecte final de Postgrau
 
-Projecte: Vuelos de avión
+Equip: Jordina Orcajo, Angela Roca, Roger Borràs, Alba Conde
+
+Projecte: Vols d'avió
 
 Tutor: Santi Seguí

@@ -4,7 +4,7 @@
 
 ### Projecte final de Postgrau
 
-Equip: Jordina Orcajo, Angela Roca, Roger Borràs, Alba Conde
+Equip: Jordina Orcajo, Angela Roca, Alba Conde, Roger Borràs
 
 Projecte: Vols d'avió
 

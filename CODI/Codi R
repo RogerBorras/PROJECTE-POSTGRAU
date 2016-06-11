@@ -7,31 +7,38 @@
 library(ggplot2)
 library(lubridate)
 library(lme4)
-
+library(dplyr)
+library(locfit)
 
 #Lectura de dades
 
-setwd("~/Escritorio/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU")
-dades <- read.csv("data.csv")
+setwd("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/R")
+dades <- read.csv("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/data.csv")
 
 
 #Manipulació de dades
+#creem el ID
+dades$Id_bitllet <- as.factor(paste(dades$ID_Vuelo, dades$fecha_salida, dades$hora_salida, dades$fecha_llegada, dades$hora_llegada, sep = '/'))
+length(levels(dades$Id_bitllet))
+dades$Id_bitllet <- as.numeric(dades$Id_bitllet)
+length(unique(dades$Id_bitllet))
 
-dades$Id_bitllet <- paste(dades$ID_Vuelo, dades$fecha_salida, dades$hora_llegada,sep = '/')
-dades$Id_bitllet <- as.factor(as.numeric(as.factor(dades$Id_bitllet)))
+#filtratge
 dades$dias_antelacion <- dades$dias_antelacion*-1
 dades$fecha_salida_dia_setmana <- weekdays(as.Date(dades$fecha_salida))
+dades$dia_query_dia_setmana <- weekdays(as.Date(dades$dia_query))
 dades$p_adultos <- dades$p_ninos <- dades$divisa <- dades$p_viejos <- dades$p_bebes_brazos <- dades$p_bebes_sentados <- NULL
+dades <- subset(dades, tipo_cabina == 'COACH')
+dades <- subset(dades, aerolinia%in%levels(dades$aerolinia)[c(5,6,11,4)]) #només ens quedem aquestes aerolinies
+length(unique(dades$Id_bitllet))
+
+#dades
+dades <- dades[,c("ID_Vuelo", "Id_bitllet", "dia_query", "dia_query_dia_setmana", "dias_antelacion", "aerolinia", "nombre_ciudad_origen", "nombre_ciudad_destino", "precio",  
+                  "fecha_salida", "fecha_salida_dia_setmana", "hora_salida", "fecha_llegada", "hora_llegada", "duracion", "demanda")]
 names(dades)
+#write.csv(dades, "dades_netes_ordenades.csv")
 
-dades_netes <- dades[,c("dia_query", "ID_Vuelo", "Id_bitllet", "aerolinia", "nombre_ciudad_origen", "nombre_ciudad_destino", "dias_antelacion", "precio",  
-                        "fecha_salida", "fecha_salida_dia_setmana", "hora_salida", "fecha_llegada", "hora_llegada", "duracion", "demanda", "tipo_cabina")]
-names(dades_netes)
-dades <- dades_netes
-write.csv(dades, "dades_netes_ordenades.csv")
-
-
-#Descripciṕ de les dades
+#Descripció de les dades
 
 summary(dades)
 sum(table(dades$Id_bitllet)>30)
@@ -40,6 +47,10 @@ sum(table(unique(dades$ID_Vuelo)))
 
 
 #Plots
+
+figura_1 <- ggplot(data = dades, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=as.factor(Id_bitllet))) + 
+  geom_point(size=1.5) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") + theme(legend.position="none")
+figura_1
 
 figura_1 <- ggplot(data = dades, aes(x = dias_antelacion, y = precio, group = Id_bitllet, color=Id_bitllet)) + 
 	geom_point(size=1.5) + geom_line( lwd=1.3) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") + theme(legend.position="none")
@@ -61,34 +72,109 @@ figura_3
 model_1 <- lm(precio ~ dias_antelacion, dades)
 summary(model_1)
 
-model_2 <- lm(precio ~ aerolinia, dades)
+model_2 <- lm(log(precio)~ dias_antelacion, dades)
 summary(model_2)
 
-model_3 <- lm(precio ~ duracion, dades)
+model_3 <- lm(precio ~ aerolinia, dades)
 summary(model_3)
 
-model_4 <- lm(precio ~ demanda, dades)
+model_4 <- lm(precio ~ duracion, dades)
 summary(model_4)
 
-model_5 <- lm(precio ~ tipo_cabina, dades)
+plot(dades$duracion, log(dades$precio), pch=16)
+
+model_5 <- lm(log(precio) ~ duracion, dades)
 summary(model_5)
 
-model_6 <- lm(precio ~ nombre_ciudad_destino, dades)
+model_6 <- lm(precio ~ demanda, dades)
 summary(model_6)
 
-model_complert <- lm(precio ~ dias_antelacion + aerolinia + duracion + demanda + tipo_cabina, dades)
-summary(model_complert)
-plot(model_complert)
+model_7 <- lm(precio ~ nombre_ciudad_destino, dades)
+summary(model_8)
 
-#Multiple R-squared:  0.4707,	Adjusted R-squared:  0.4706 !! Not bad!
+model_8 <- lm(precio ~ fecha_salida_dia_setmana, dades)
+summary(model_8)
 
-model_complert_interaccions <- lm(precio ~ dias_antelacion*aerolinia*duracion*demanda*tipo_cabina, dades)
-summary(model_complert_interaccions)
-plot(model_complert_interaccions)
+model_9 <- lm(precio ~ dia_query_dia_setmana, dades)
+summary(model_10)
 
-# Multiple R-squared:  0.5031,	Adjusted R-squared:  0.5025 !! Bad! 
+model_complert_1 <- lm(precio ~ dias_antelacion + aerolinia + duracion + demanda, dades)
+summary(model_complert_1)
 
-#Mixel models...
-#model <- lmer(precio ~ dias_antelacion + (1+dias_antelacion|Id_bitllet), dades)
-#summary(model)
-#plot(model)
+model_complert_2 <- lm(precio ~ fecha_salida_dia_setmana + dia_query_dia_setmana + dias_antelacion + nombre_ciudad_destino + aerolinia  + demanda, dades)
+summary(model_complert_2)
+plot(model_complert_2)
+
+#Multiple R-squared:  0.4982,	Adjusted R-squared:  0.4981 
+
+model_complert_3 <- lm(log(precio) ~ fecha_salida_dia_setmana + dia_query_dia_setmana + dias_antelacion + nombre_ciudad_destino + aerolinia  + demanda, dades)
+summary(model_complert_3)
+plot(model_complert_3)
+
+#Multiple R-squared:  0.5616,	Adjusted R-squared:  0.5614  Not bad!
+
+#Codi Roc
+#library(dplyr)
+#a <-group_by(dades, Id_bitllet_num)
+#b <- filter(a,rank(dias_antelacion,ties.method = "first")==1)
+#b<[which(b$Id_bitllet_num==1632),]
+#c <- merge(dades, b, by.x="Id_bitllet_num", by.y="Id_bitllet_num")
+#c$std <- c$precio.x-c$precio.y
+#c$Id_bitllet_num
+#figura_1 <- ggplot(data = c, aes(x = dias_antelacion.x, y = std, group = Id_bitllet_num, color=Id_bitllet_num)) + 
+#  geom_point(size=1.5) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") + theme(legend.position="none")
+#figura_1
+#figura_1 <- ggplot(data = c, aes(x = dias_antelacion.x, y = std, group = Id_bitllet_num, color=c$nombre_ciudad_destino.x)) + 
+#  geom_point(size=1.5) + theme_grey(base_size = 20) + xlab("TIME") + ylab("PRICE") 
+#figura_1
+
+#y <- c(1,2,3,6,4,5,7,9,1,3,5,2)
+#x <- 1:1000
+#x_norm <- x/(length(x))
+#y <- (1/x_norm^2)*sin(10*2*pi*x_norm^4)
+#plot(y)
+#prop <- cummin(y[length(y):1])[length(y):1]!=y
+#plot(y, col=(prop+1))
+#?cummin
+#names(dades)
+
+#Variable baixada preu
+dades <- dades[order(dades$dias_antelacion),]
+dades <- dades[order(dades$Id_bitllet),]
+dades$baixada_preu <- as.numeric(unlist(tapply(dades$precio, dades$Id_bitllet, FUN = function(y) cummin(y[length(y):1])[length(y):1]!=y)))
+#dades$baixada_preu <- as.numeric(unlist(tapply(dades$precio, dades$Id_bitllet, FUN = function(y) cummin(y[length(y):1])[length(y):1]==y)))
+
+# Regressió local
+regresio <- locfit(dades$baixada_preu ~ dades$dias_antelacion, family="binomial") 
+
+#plot(regresio)
+dades_plot <- data.frame(dies=-seq(0:140), prediccio=predict(regresio,-seq(0:140), se.fit=T)$fit, 
+                       se_prediccio=predict(regresio,-seq(0:140), se.fit=T)$se.fit)
+
+dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
+dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
+
+fig <- ggplot(dades_plot, aes(x=dies))
+fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
+fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
+fig <- fig + geom_line(aes(dies, prediccio), color="blue")
+fig <- fig + xlab("DAYS") + ylab("PROPORTION") + theme_gray(base_size = 20)
+fig 
+
+
+#model glm
+
+dades$categoritacio_temporal <- (dades$dias_antelacion < (-100)) + (dades$dias_antelacion < (-70)) + (dades$dias_antelacion < (-50)) + (dades$dias_antelacion < (-20))
+dades$categoritacio_temporal <- as.factor(dades$categoritacio_temporal)
+
+summary(glm(dades$baixada_preu ~ dades$categoritacio_temporal, family = binomial()))
+
+model <- glmer(baixada_preu ~ categoritacio_temporal + (1 | Id_bitllet), family = "binomial", data = dades)
+summary(model)
+
+taula_OR <- exp(cbind(coef(summary(model))[,1],coef(summary(model))[,1]-1.96*coef(summary(model))[,2],
+                      coef(summary(model))[,1]+1.96*coef(summary(model))[,2]))
+colnames(taula_OR) <- c("OR", "OR_inf_CI", "OR_sup_CI")
+taula_OR <- cbind(taula_OR, coef(summary(model))[,3:4])
+taula_OR <- as.data.frame(round(taula_OR, 3))
+taula_OR

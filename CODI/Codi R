@@ -36,7 +36,7 @@ length(unique(dades$Id_bitllet))
 dades <- dades[,c("ID_Vuelo", "Id_bitllet", "dia_query", "dia_query_dia_setmana", "dias_antelacion", "aerolinia", "nombre_ciudad_origen", "nombre_ciudad_destino", "precio",  
                   "fecha_salida", "fecha_salida_dia_setmana", "hora_salida", "fecha_llegada", "hora_llegada", "duracion", "demanda")]
 names(dades)
-#write.csv(dades, "dades_netes_ordenades.csv")
+#write.csv(dades, "dades_11_06_2016.csv")
 
 #Descripció de les dades
 
@@ -178,3 +178,4 @@ colnames(taula_OR) <- c("OR", "OR_inf_CI", "OR_sup_CI")
 taula_OR <- cbind(taula_OR, coef(summary(model))[,3:4])
 taula_OR <- as.data.frame(round(taula_OR, 3))
 taula_OR
+

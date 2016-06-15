@@ -4,6 +4,6 @@
 
 Projecte: Vols d'avió
 
-Equip: Jordina Orcajo, Angela Roca, Alba Conde, Roger Borràs
+Equip(azo): Jordina Orcajo, Angela Roca, Alba Conde, Roger Borràs
 
 Tutor: Santi Seguí

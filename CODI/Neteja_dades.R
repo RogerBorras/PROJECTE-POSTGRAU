@@ -28,7 +28,7 @@ dades$dias_antelacion <- dades$dias_antelacion*-1
 dades$fecha_salida_dia_setmana <- weekdays(as.Date(dades$fecha_salida))
 dades$fecha_llegada_dia_setmana <- weekdays(as.Date(dades$fecha_llegada))
 dades$dia_query_dia_setmana <- weekdays(as.Date(dades$dia_query))
-dades$demanda<-as.factor(dades$demanda)
+dades$demanda <- as.factor(dades$demanda)
 dades$p_adultos <- dades$p_ninos <- dades$divisa <- dades$p_viejos <- dades$p_bebes_brazos <- dades$p_bebes_sentados <- NULL
 dades <- subset(dades, tipo_cabina == 'COACH')
 dades <- subset(dades, aerolinia%in%levels(dades$aerolinia)[c(5,6,11,4)]) #només ens quedem aquestes aerolinies
@@ -47,3 +47,9 @@ dades <- dades[order(dades$Id_bitllet),]
 dades$baixada_preu <- as.factor(as.numeric(unlist(tapply(dades$precio, dades$Id_bitllet, FUN = function(y) cummin(y[length(y):1])[length(y):1]==y))))
 
 #write.csv(dades, "dades_4_07_2016.csv")
+
+#Per a la part descriptiva:
+#Els preus diferents de cada bitllet.
+dades2 <- unique(dades[,c(2, 9)])
+dades2 <- merge(dades, dades2, by.x = "row.names", by.y = "row.names")[,1:18]
+#write.csv(dades2, "C:/Users/jorcajo/Desktop/PROJECTE-POSTGRAU-master/DADES/dades2.csv")

@@ -2,7 +2,7 @@
 
 ## PROJECTE FINAL
 
-Projecte: Vols d'avió
+Projecte: Pricing dels vols d'avió
 
 Equip: Jordina Orcajo, Angela Roca, Alba Conde, Roger Borràs
 

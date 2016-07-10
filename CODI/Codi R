@@ -16,7 +16,7 @@ setwd("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/R")
 dades <- read.csv("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/data.csv")
 
 
-#Manipulaci? de dades
+#Manipulació de dades
 #creem el ID
 dades$Id_bitllet <- as.factor(paste(dades$ID_Vuelo, dades$fecha_salida, dades$hora_salida, dades$fecha_llegada, dades$hora_llegada, sep = '/'))
 length(levels(dades$Id_bitllet))
@@ -30,7 +30,7 @@ dades$fecha_llegada_dia_setmana <- weekdays(as.Date(dades$fecha_llegada))
 dades$dia_query_dia_setmana <- weekdays(as.Date(dades$dia_query))
 dades$p_adultos <- dades$p_ninos <- dades$divisa <- dades$p_viejos <- dades$p_bebes_brazos <- dades$p_bebes_sentados <- NULL
 dades <- subset(dades, tipo_cabina == 'COACH')
-dades <- subset(dades, aerolinia%in%levels(dades$aerolinia)[c(5,6,11,4)]) #nom?s ens quedem aquestes aerolinies
+dades <- subset(dades, aerolinia%in%levels(dades$aerolinia)[c(5,6,11,4)]) #només ens quedem aquestes aerolinies
 length(unique(dades$Id_bitllet))
 
 #dades
@@ -39,7 +39,7 @@ dades <- dades[,c("ID_Vuelo", "Id_bitllet", "dia_query", "dia_query_dia_setmana"
                   "hora_salida", "fecha_llegada", "fecha_llegada_dia_setmana","hora_llegada", "duracion", "demanda")]
 names(dades)
 
-#Creaci? variables
+#Creació variables
 
 dades <- dades[order(dades$dias_antelacion),]
 dades <- dades[order(dades$Id_bitllet),]
@@ -47,7 +47,7 @@ dades$baixada_preu <- as.numeric(unlist(tapply(dades$precio, dades$Id_bitllet, F
 
 #write.csv(dades, "dades_4_07_2016.csv")
 
-#Descripci? de les dades
+#Descripció de les dades
 
 summary(dades)
 sum(table(dades$Id_bitllet)>30)
@@ -210,7 +210,7 @@ dades <- dades[order(dades$Id_bitllet),]
 dades$baixada_preu <- as.numeric(unlist(tapply(dades$precio, dades$Id_bitllet, FUN = function(y) cummin(y[length(y):1])[length(y):1]==y)))
 #dades$baixada_preu <- as.numeric(unlist(tapply(dades$precio, dades$Id_bitllet, FUN = function(y) cummin(y[length(y):1])[length(y):1]==y)))
 
-# Regressi? local
+# Regressió local
 regresio <- locfit(dades$baixada_preu ~ dades$dias_antelacion, family="binomial") 
 predict(regresio)
 
@@ -355,7 +355,7 @@ fig
 
 names(dades)
 
-#Mirem si els preus dels vols s?n m?s cars a principis de mes.
+#Mirem si els preus dels vols són més cars a principis de mes.
 
 dades$fecha_salida
 dades$dia_query_dia_mes <- day(as.Date(dades$dia_query))
@@ -413,7 +413,7 @@ plot(model_complert_2)
 
 
 #################
-###Modelizaci?###
+###Modelizació###
 #################
 
 library(randomForest)
@@ -428,10 +428,19 @@ library(gridExtra)
 
 dades <- read.csv("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/R/dades_4_07_2016.csv")
 
-#model amb preu normalitzat
+#model pres
+
+regresio <- lm(precio ~ dias_antelacion, dades[dades$dias_antelacion<(-55),]) 
+summary(regresio)
+
+regresio <- lm(precio ~ dias_antelacion, dades[dades$dias_antelacion>(-55),]) 
+summary(regresio)
 
 regresio <- locfit(precio ~ dias_antelacion, dades) 
+summary(regresio)
 plot(regresio)
+
+#model amb preu normalitzat
 
 dades$precio_norm <- unlist(tapply(dades$precio, dades$Id_bitllet, scale))
 
@@ -444,14 +453,14 @@ plot(regresio)
 dades_plot <- data.frame(dies=-seq(0:140), prediccio=predict(regresio,-seq(0:140), se.fit=T)$fit, 
                          se_prediccio=predict(regresio,-seq(0:140), se.fit=T)$se.fit)
 
-dades_plot$prediccio_inf <- dades_plot$prediccio - 4*dades_plot$se_prediccio
-dades_plot$prediccio_sup <- dades_plot$prediccio + 4*dades_plot$se_prediccio
+dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
+dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
 fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
 fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
 fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig <- fig + xlab("DIES D'ANTELACI?") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20)
+fig <- fig + xlab("DIES D'ANTELACIÓ") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20)
 fig
 
 
@@ -475,8 +484,8 @@ plot(regresio_VA)
 dades_plot <- data.frame(dies=-seq(0:140), prediccio=predict(regresio_BA,-seq(0:140), se.fit=T)$fit, 
                          se_prediccio=predict(regresio,-seq(0:140), se.fit=T)$se.fit)
 
-dades_plot$prediccio_inf <- dades_plot$prediccio - 4*dades_plot$se_prediccio
-dades_plot$prediccio_sup <- dades_plot$prediccio + 4*dades_plot$se_prediccio
+dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
+dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
 fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
@@ -489,8 +498,8 @@ fig_BA
 dades_plot <- data.frame(dies=-seq(0:140), prediccio=predict(regresio_DL,-seq(0:140), se.fit=T)$fit, 
                          se_prediccio=predict(regresio,-seq(0:140), se.fit=T)$se.fit)
 
-dades_plot$prediccio_inf <- dades_plot$prediccio - 4*dades_plot$se_prediccio
-dades_plot$prediccio_sup <- dades_plot$prediccio + 4*dades_plot$se_prediccio
+dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
+dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
 fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
@@ -503,28 +512,28 @@ fig_DL
 dades_plot <- data.frame(dies=-seq(0:140), prediccio=predict(regresio_IB,-seq(0:140), se.fit=T)$fit, 
                          se_prediccio=predict(regresio,-seq(0:140), se.fit=T)$se.fit)
 
-dades_plot$prediccio_inf <- dades_plot$prediccio - 4*dades_plot$se_prediccio
-dades_plot$prediccio_sup <- dades_plot$prediccio + 4*dades_plot$se_prediccio
+dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
+dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
 fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
 fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
 fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig_IB <- fig + xlab("DIES D'ANTELACI?") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20) + ggtitle("Iberia Lineas Aereas") + 
+fig_IB <- fig + xlab("DIES D'ANTELACIÓ") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20) + ggtitle("Iberia Lineas Aereas") + 
   theme(plot.title = element_text(lineheight=.8, face="bold"))
 fig_IB
 
 dades_plot <- data.frame(dies=-seq(0:140), prediccio=predict(regresio_VA,-seq(0:140), se.fit=T)$fit, 
                          se_prediccio=predict(regresio,-seq(0:140), se.fit=T)$se.fit)
 
-dades_plot$prediccio_inf <- dades_plot$prediccio - 4*dades_plot$se_prediccio
-dades_plot$prediccio_sup <- dades_plot$prediccio + 4*dades_plot$se_prediccio
+dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
+dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
 fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
 fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
 fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig_VA <- fig + xlab("DIES D'ANTELACI?") + ylab("") + theme_gray(base_size = 20) + ggtitle("Vueling Airlines") + 
+fig_VA <- fig + xlab("DIES D'ANTELACIÓ") + ylab("") + theme_gray(base_size = 20) + ggtitle("Vueling Airlines") + 
   theme(plot.title = element_text(lineheight=.8, face="bold"))
 fig_VA
 
@@ -568,10 +577,42 @@ plot(regresio_BA)
 regresio_BA <- locfit(precio_norm ~ dias_antelacion, dades[dades$nombre_ciudad_destino=="Paris" ,]) 
 plot(regresio_BA)
 
-#Model de predicc? del preu
+#Model de prediccó del preu
+
+dades$fecha_salida_dia_setmana <- relevel(dades$fecha_salida_dia_setmana, ref = 'dimecres')
+model_1 <- lm(precio ~ fecha_salida_dia_setmana, dades)
+summary(model_1)
+anova(model_1)
+
+dades$dia_query_dia_setmana <- relevel(dades$dia_query_dia_setmana, ref = 'dimarts')
+model_2 <- lm(precio ~ dia_query_dia_setmana, dades)
+summary(model_2)
+anova(model_2)
+
+model_3 <- lm(precio ~ dias_antelacion, dades)
+summary(model_3)
+anova(model_3)
+
+model_4 <- lm(precio ~ nombre_ciudad_destino, dades)
+summary(model_4)
+anova(model_4)
+
+model_5 <- lm(precio ~ aerolinia, dades)
+summary(model_5)
+anova(model_5)
+
+model_6 <- lm(precio ~ duracion, dades)
+summary(model_6)
+anova(model_6)
+
+model_7 <- lm(precio ~ demanda, dades)
+summary(model_7)
+anova(model_7)
 
 model_complert_prediccio_preu <- lm(precio ~ fecha_salida_dia_setmana + dia_query_dia_setmana + dias_antelacion + 
                                       nombre_ciudad_destino + aerolinia+duracion  + demanda, dades)
+summary(model_complert_prediccio_preu)
+plot(model_complert_prediccio_preu)
 
 model_complert_prediccio_preu <- lm(log(precio) ~ fecha_salida_dia_setmana + dia_query_dia_setmana + dias_antelacion + 
                          nombre_ciudad_destino + aerolinia+duracion  + demanda, dades)
@@ -614,3 +655,4 @@ pred_rf <- table(predict(randomforest_entrenament),dades$baixada_preu)
 100*sum(diag(pred_rf))/sum(pred_rf)
 
 #ACC RF=87.80574
+

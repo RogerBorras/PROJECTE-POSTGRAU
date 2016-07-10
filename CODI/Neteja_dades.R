@@ -35,7 +35,7 @@ dades <- subset(dades, aerolinia%in%levels(dades$aerolinia)[c(5,6,11,4)]) #nomé
 length(unique(dades$Id_bitllet))
 
 #dades
-dades <- dades[,c("ID_Vuelo", "Id_bitllet", "dia_query", "dia_query_dia_setmana", "dias_antelacion", "aerolinia", 
+dades <- dades[,c("Id_bitllet", "dia_query", "dia_query_dia_setmana", "dias_antelacion", "aerolinia", 
                   "nombre_ciudad_origen", "nombre_ciudad_destino", "precio", "fecha_salida", "fecha_salida_dia_setmana", 
                   "hora_salida", "fecha_llegada", "fecha_llegada_dia_setmana","hora_llegada", "duracion", "demanda")]
 names(dades)

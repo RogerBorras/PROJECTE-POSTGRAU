@@ -460,7 +460,7 @@ fig <- ggplot(dades_plot, aes(x=dies))
 fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
 fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
 fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig <- fig + xlab("DIES D'ANTELACIÓ") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20)
+fig <- fig + xlab("Days in advance") + ylab("Standardized ticket price") + theme_gray(base_size = 20)
 fig
 
 
@@ -488,10 +488,10 @@ dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
 dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
-fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
-fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
-fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig_BA <- fig + xlab("") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20) + ggtitle("British Airways") + 
+fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="red", alpha=I(0.30))
+fig <- fig + geom_point(size=2, aes(dies, prediccio), color="red")
+fig <- fig + geom_line(aes(dies, prediccio), color="red")
+fig_BA <- fig + xlab("") + ylab("Standardized ticket price") + theme_gray(base_size = 20) + ggtitle("British Airways") + 
   theme(plot.title = element_text(lineheight=.8, face="bold"))
 fig_BA
 
@@ -516,10 +516,10 @@ dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
 dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
-fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
-fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
-fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig_IB <- fig + xlab("DIES D'ANTELACIÓ") + ylab("PREU BITLLET NORMALITZAT") + theme_gray(base_size = 20) + ggtitle("Iberia Lineas Aereas") + 
+fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="orange", alpha=I(0.30))
+fig <- fig + geom_point(size=2, aes(dies, prediccio), color="orange")
+fig <- fig + geom_line(aes(dies, prediccio), color="orange")
+fig_IB <- fig + xlab("Days in advance") + ylab("Standardized ticket price") + theme_gray(base_size = 20) + ggtitle("Iberia Lineas Aereas") + 
   theme(plot.title = element_text(lineheight=.8, face="bold"))
 fig_IB
 
@@ -530,13 +530,12 @@ dades_plot$prediccio_inf <- dades_plot$prediccio - 1.96*dades_plot$se_prediccio
 dades_plot$prediccio_sup <- dades_plot$prediccio + 1.96*dades_plot$se_prediccio
 
 fig <- ggplot(dades_plot, aes(x=dies))
-fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="blue", alpha=I(0.30))
-fig <- fig + geom_point(size=2, aes(dies, prediccio), color="blue")
-fig <- fig + geom_line(aes(dies, prediccio), color="blue")
-fig_VA <- fig + xlab("DIES D'ANTELACIÓ") + ylab("") + theme_gray(base_size = 20) + ggtitle("Vueling Airlines") + 
+fig <- fig + geom_ribbon(aes(ymin=prediccio_inf, ymax=prediccio_sup),fill="yellow", alpha=I(0.30))
+fig <- fig + geom_point(size=2, aes(dies, prediccio), color="yellow")
+fig <- fig + geom_line(aes(dies, prediccio), color="yellow")
+fig_VA <- fig + xlab("Days in advance") + ylab("") + theme_gray(base_size = 20) + ggtitle("Vueling Airlines") + 
   theme(plot.title = element_text(lineheight=.8, face="bold"))
 fig_VA
-
 
 grid.arrange(fig_BA, fig_DL, fig_IB,fig_VA , ncol = 2)
 
@@ -617,7 +616,14 @@ plot(model_complert_prediccio_preu)
 model_complert_prediccio_preu <- lm(log(precio) ~ fecha_salida_dia_setmana + dia_query_dia_setmana + dias_antelacion + 
                          nombre_ciudad_destino + aerolinia+duracion  + demanda, dades)
 summary(model_complert_prediccio_preu)
-plot(model_complert_prediccio_preu)
+#plot(model_complert_prediccio_preu)
+
+prediccio_dia_1 <- data.frame(fecha_salida_dia_setmana = 'divendres',dia_query_dia_setmana = 'divendres',dias_antelacion =5,  
+                              nombre_ciudad_destino = 'Munich', aerolinia = 'Vueling Airlines S.A.', duracion = 125,  demanda = 0)
+
+exp(predict(model_complert_prediccio_preu, prediccio_dia_1))
+names(dades)
+
 
 #Model recomanador
 
@@ -655,4 +661,3 @@ pred_rf <- table(predict(randomforest_entrenament),dades$baixada_preu)
 100*sum(diag(pred_rf))/sum(pred_rf)
 
 #ACC RF=87.80574
-

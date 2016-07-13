@@ -616,7 +616,9 @@ plot(model_complert_prediccio_preu)
 model_complert_prediccio_preu <- lm(log(precio) ~ fecha_salida_dia_setmana + dia_query_dia_setmana + dias_antelacion + 
                          nombre_ciudad_destino + aerolinia+duracion  + demanda, dades)
 summary(model_complert_prediccio_preu)
+anova(model_complert_prediccio_preu)
 #plot(model_complert_prediccio_preu)
+
 
 prediccio_dia_1 <- data.frame(fecha_salida_dia_setmana = 'divendres',dia_query_dia_setmana = 'divendres',dias_antelacion =5,  
                               nombre_ciudad_destino = 'Munich', aerolinia = 'Vueling Airlines S.A.', duracion = 125,  demanda = 0)
@@ -653,11 +655,75 @@ pred_rl <- table(prediccio>0.53, dades$baixada_preu)
 
 #ACC RL= 71.36369
 
+library(randomForest)
 randomforest_entrenament <- randomForest(baixada_preu ~ precio + fecha_salida_dia_setmana + dia_query_dia_setmana + 
                                            dias_antelacion +  fecha_llegada_dia_setmana + 
                                            nombre_ciudad_destino + aerolinia  + demanda, family=binomial(), data=dades)
 ?randomForest
+varImpPlot(randomforest_entrenament, main="Mostra d'entrenament")
+
+
 pred_rf <- table(predict(randomforest_entrenament),dades$baixada_preu)
 100*sum(diag(pred_rf))/sum(pred_rf)
 
 #ACC RF=87.80574
+
+#Arbre final
+
+dades <- read.csv("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/R/dades_4_07_2016.csv")
+
+library(rpart)
+library(partykit)
+
+sample_train <- sample(1:nrow(dades), size=nrow(dades)*0.67)
+test <- dades[-sample_train, ]
+dades <- dades[sample_train, ]
+
+dades$baixada_preu <- as.factor(dades$baixada_preu)
+
+CART_entrenament <- rpart(baixada_preu ~ precio + fecha_salida_dia_setmana + dia_query_dia_setmana + duracion +
+                                           dias_antelacion +  nombre_ciudad_destino + aerolinia  + demanda, data=dades, cp=0.00001) 
+CART_entrenament_pk <- as.party(CART_entrenament)
+
+varI
+#CART_entrenament_pk
+#plot(CART_entrenament_pk)
+pred_cart <- table(predict(CART_entrenament_pk),dades$baixada_preu)
+100*sum(diag(pred_cart))/sum(pred_cart)
+plot(pred_cart)
+importance(CART_entrenament)
+
+pred_cart_test <- table(predict(CART_entrenament_pk, test),test$baixada_preu)
+100*sum(diag(pred_cart_test))/sum(pred_cart_test)
+
+
+Dades_prediccio_dia_1 <- data.frame(fecha_salida_dia_setmana = 'divendres', dia_query_dia_setmana = 'divendres',
+                                    dias_antelacion=5.0, nombre_ciudad_destino='Munich', precio=75.0,
+                                    fecha_llegada_dia_setmana = 'divendres',
+                                    aerolinia='Vueling Airlines S.A.', duracion=125.0 , demanda=0)
+  
+predict(CART_entrenament_pk, Dades_prediccio_dia_1)
+
+#Figures
+#Dies setmana
+
+dades <- read.csv("C:/Users/usuario/Desktop/POSTGRAU_DATA_SCIENCE/PROJECTE_POSTGRAU/R/dades_4_07_2016.csv")
+
+library(ggplot2)
+library(plyr)
+
+
+summary <- ddply(dades, ~dia_query_dia_setmana, summarise,
+                 mean=mean(precio,na.rm=TRUE), sd=sd(precio,na.rm=TRUE),
+                 se=sd(precio,na.rm=TRUE)/length(na.omit(precio)))
+
+summary$nou_ordre <- factor(summary$dia_query_dia_setmana, c("dilluns", "dimarts", "dimecres", "dijous", "divendres", "dissabte", "diumenge"))
+  
+q_se <- ggplot(data = summary, aes(x = nou_ordre, y = mean)) + 
+  geom_point(size=6) + geom_line(aes(x = as.numeric(nou_ordre), y = mean), lwd=1.3) + 
+  #geom_errorbar(aes(ymin = mean-se,ymax = mean+se), lwd=1.5, width=0.2) + 
+  theme_grey(base_size = 20) + xlab("Week day") + ylab("Mean price")+ 
+  scale_x_discrete(breaks=c("dilluns", "dimarts", "dimecres", "dijous", "divendres", "dissabte", "diumenge"),
+  labels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+q_se
+

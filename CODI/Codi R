@@ -727,3 +727,4 @@ q_se <- ggplot(data = summary, aes(x = nou_ordre, y = mean)) +
   labels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 q_se
 
+
